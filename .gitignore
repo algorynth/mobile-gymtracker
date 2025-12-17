@@ -1,0 +1,85 @@
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# iOS
+ios/.symlinks/
+ios/Flutter/.last_build_id
+ios/Flutter/App.framework/
+ios/Flutter/Flutter.framework/
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/ephemeral/
+ios/Pods/
+ios/.generated/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Web
+web/.dart_tool/
+web/.packages
+
+# Linux
+linux/flutter/ephemeral/
+
+# macOS
+macos/Flutter/ephemeral/
+macos/Pods/
+
+# Windows
+windows/flutter/ephemeral/
+
+# Hive
+*.hive
+*.lock
+
+# Coverage
+coverage/
+*.lcov
+
+# IDE
+.vscode/settings.json
+.vscode/launch.json
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test
+.test_coverage.dart
+
+# Generated
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Secrets
+.env
+.env.*
+secrets.dart

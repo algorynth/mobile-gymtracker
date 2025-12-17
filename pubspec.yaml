@@ -1,0 +1,61 @@
+name: gym_tracker
+description: Kapsamlı gym takip uygulaması - kilo, yağ/kas oranı ve kalori takibi
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # State Management
+  flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.3
+  
+  # Local Database
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  
+  # Charts & Graphs
+  fl_chart: ^0.65.0
+  
+  # Utilities
+  intl: ^0.18.1
+  uuid: ^4.2.1
+  shared_preferences: ^2.2.2
+  
+  # Image Picker
+  image_picker: ^1.0.4
+  permission_handler: ^11.0.1
+  
+  # UI Components
+  cupertino_icons: ^1.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.7
+  riverpod_generator: ^2.3.9
+  hive_generator: ^2.0.1
+
+flutter:
+  uses-material-design: true
+  
+  # Assets
+  # assets:
+  #   - images/
+  
+  # Fonts (Inter fontunu kullanmak için Google Fonts'tan indirip fonts/ klasörüne ekleyin)
+  # fonts:
+  #   - family: Inter
+  #     fonts:
+  #       - asset: fonts/Inter-Regular.ttf
+  #       - asset: fonts/Inter-Medium.ttf
+  #         weight: 500
+  #       - asset: fonts/Inter-SemiBold.ttf
+  #         weight: 600
+  #       - asset: fonts/Inter-Bold.ttf
+  #         weight: 700
