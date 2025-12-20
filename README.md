@@ -6,6 +6,13 @@ Modern, kapsamlı bir fitness takip uygulaması. Flutter ile geliştirildi.
 ![Dart](https://img.shields.io/badge/Dart-3.0+-0175C2?logo=dart)
 ![Platform](https://img.shields.io/badge/Platform-Android%20|%20iOS%20|%20Web%20|%20Desktop-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
+![Build](https://github.com/Mobile-Apps-Coop/mobile-gymtracker/actions/workflows/build-aab.yml/badge.svg)
+
+## 📥 İndirme
+
+[![Download AAB](https://img.shields.io/badge/Download-Latest%20AAB-green?style=for-the-badge&logo=android)](https://github.com/Mobile-Apps-Coop/mobile-gymtracker/releases/latest)
+
+> **Not:** Her push işleminde otomatik olarak yeni bir AAB dosyası oluşturulur. En son sürümü yukarıdaki butona tıklayarak indirebilirsiniz.
 
 ## ✨ Özellikler
 
@@ -44,8 +51,8 @@ Modern, kapsamlı bir fitness takip uygulaması. Flutter ile geliştirildi.
 
 ```bash
 # Repoyu klonla
-git clone https://github.com/KULLANICI_ADI/gym_tracker.git
-cd gym_tracker
+git clone https://github.com/Mobile-Apps-Coop/mobile-gymtracker.git
+cd mobile-gymtracker
 
 # Bağımlılıkları yükle
 flutter pub get
@@ -80,9 +87,12 @@ lib/
 └── main.dart       # Giriş noktası
 ```
 
-## 📸 Ekran Görüntüleri
+## 🔄 CI/CD
 
-> Yakında eklenecek
+Bu proje GitHub Actions kullanarak otomatik build yapar:
+
+- Her `main` branch'e push yapıldığında AAB dosyası oluşturulur
+- Oluşturulan AAB dosyaları [Releases](https://github.com/Mobile-Apps-Coop/mobile-gymtracker/releases) sayfasında yayınlanır
 
 ## 🤝 Katkıda Bulunma
 
