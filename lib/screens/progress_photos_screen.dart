@@ -305,7 +305,7 @@ class _ProgressPhotosScreenState extends ConsumerState<ProgressPhotosScreen>
             Icon(
               Icons.photo_camera_rounded,
               size: 80,
-              color: AppColors.textSecondary.withValues(alpha: 0.5),
+              color: AppColors.textSecondary.withOpacity( 0.5),
             ),
             const SizedBox(height: 16),
             Text(
@@ -432,7 +432,7 @@ class _ProgressPhotosScreenState extends ConsumerState<ProgressPhotosScreen>
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.close_rounded),
                     style: IconButton.styleFrom(
-                      backgroundColor: AppColors.darkBackground.withValues(alpha: 0.7),
+                      backgroundColor: AppColors.darkBackground.withOpacity( 0.7),
                     ),
                   ),
                 ),

@@ -30,7 +30,7 @@ class WeightChartWidget extends StatelessWidget {
               Icon(
                 Icons.show_chart_rounded,
                 size: 48,
-                color: AppColors.textSecondary.withValues(alpha: 0.5),
+                color: AppColors.textSecondary.withOpacity( 0.5),
               ),
               const SizedBox(height: 12),
               Text(
@@ -204,8 +204,8 @@ class WeightChartWidget extends StatelessWidget {
                       show: true,
                       gradient: LinearGradient(
                         colors: [
-                          AppColors.accentGreen.withValues(alpha: 0.3),
-                          AppColors.primaryColor.withValues(alpha: 0.0),
+                          AppColors.accentGreen.withOpacity( 0.3),
+                          AppColors.primaryColor.withOpacity( 0.0),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -271,7 +271,7 @@ class BodyCompositionChartWidget extends StatelessWidget {
               Icon(
                 Icons.pie_chart_rounded,
                 size: 48,
-                color: AppColors.textSecondary.withValues(alpha: 0.5),
+                color: AppColors.textSecondary.withOpacity( 0.5),
               ),
               const SizedBox(height: 12),
               Text(

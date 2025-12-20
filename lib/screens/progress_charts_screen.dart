@@ -41,7 +41,7 @@ class ProgressChartsScreen extends ConsumerWidget {
                   Container(
                     width: 1,
                     height: 50,
-                    color: AppColors.textPrimary.withValues(alpha: 0.3),
+                    color: AppColors.textPrimary.withOpacity( 0.3),
                   ),
                   _buildStatItem(
                     context,
@@ -54,7 +54,7 @@ class ProgressChartsScreen extends ConsumerWidget {
                   Container(
                     width: 1,
                     height: 50,
-                    color: AppColors.textPrimary.withValues(alpha: 0.3),
+                    color: AppColors.textPrimary.withOpacity( 0.3),
                   ),
                   _buildStatItem(
                     context,
@@ -144,7 +144,7 @@ class ProgressChartsScreen extends ConsumerWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textPrimary.withValues(alpha: 0.8),
+                color: AppColors.textPrimary.withOpacity( 0.8),
               ),
         ),
       ],

@@ -53,7 +53,7 @@ class WorkoutTemplatesScreen extends ConsumerWidget {
                         Text(
                           'Profesyonel antrenman şablonlarını kullanarak hemen başla!',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.textPrimary.withValues(alpha: 0.8),
+                                color: AppColors.textPrimary.withOpacity( 0.8),
                               ),
                         ),
                       ],
@@ -129,7 +129,7 @@ class WorkoutTemplatesScreen extends ConsumerWidget {
                       Text(
                         WorkoutTemplateLibrary.getCategoryName(template.category),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textPrimary.withValues(alpha: 0.8),
+                              color: AppColors.textPrimary.withOpacity( 0.8),
                             ),
                       ),
                     ],
@@ -138,7 +138,7 @@ class WorkoutTemplatesScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.textPrimary.withValues(alpha: 0.2),
+                    color: AppColors.textPrimary.withOpacity( 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -334,7 +334,7 @@ class WorkoutTemplatesScreen extends ConsumerWidget {
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                              color: AppColors.primaryColor.withValues(alpha: 0.2),
+                              color: AppColors.primaryColor.withOpacity( 0.2),
                               shape: BoxShape.circle,
                             ),
                             child: Center(
