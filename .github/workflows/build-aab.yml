@@ -34,6 +34,18 @@ jobs:
     - name: Generate code
       run: dart run build_runner build --delete-conflicting-outputs
     
+    # Decode and setup signing configuration
+    - name: Decode Keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+      
+    - name: Create key.properties
+      run: |
+        echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+        echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+        echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+        echo "storeFile=keystore.jks" >> android/key.properties
+    
     - name: Build APK
       run: flutter build apk --release --no-tree-shake-icons
     
