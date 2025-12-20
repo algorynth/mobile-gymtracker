@@ -1,4 +1,4 @@
-name: Build Android AAB
+name: Build Flutter Apps
 
 on:
   push:
@@ -8,8 +8,9 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-android:
     runs-on: ubuntu-latest
+    name: Build Android (APK & AAB)
     
     steps:
     - name: Checkout code
@@ -30,28 +31,125 @@ jobs:
     - name: Get dependencies
       run: flutter pub get
     
-    - name: Build AAB (unsigned)
+    - name: Build APK
+      run: flutter build apk --release --no-tree-shake-icons
+    
+    - name: Build AAB
       run: flutter build appbundle --release --no-tree-shake-icons
     
-    - name: Rename AAB with version
+    - name: Get version
+      id: version
       run: |
         VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
-        mv build/app/outputs/bundle/release/app-release.aab build/app/outputs/bundle/release/gym-tracker-v${VERSION}.aab
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
     
-    - name: Upload AAB Artifact
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: gym-tracker-aab
-        path: build/app/outputs/bundle/release/*.aab
+        name: android-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
         retention-days: 90
     
-    - name: Create Release (on main branch push)
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    - name: Upload AAB
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-aab
+        path: build/app/outputs/bundle/release/app-release.aab
+        retention-days: 90
+
+  build-ios:
+    runs-on: macos-latest
+    name: Build iOS (IPA)
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.24.0'
+        channel: 'stable'
+    
+    - name: Get dependencies
+      run: flutter pub get
+    
+    - name: Build iOS (no codesign)
+      run: flutter build ios --release --no-codesign --no-tree-shake-icons
+    
+    - name: Create IPA
+      run: |
+        cd build/ios/iphoneos
+        mkdir Payload
+        mv Runner.app Payload/
+        zip -r GymTracker.ipa Payload
+    
+    - name: Upload IPA
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-ipa
+        path: build/ios/iphoneos/GymTracker.ipa
+        retention-days: 90
+
+  release:
+    needs: [build-android, build-ios]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    name: Create Release
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Get version
+      id: version
+      run: |
+        VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+    
+    - name: Download Android APK
+      uses: actions/download-artifact@v4
+      with:
+        name: android-apk
+        path: ./artifacts/android
+    
+    - name: Download Android AAB
+      uses: actions/download-artifact@v4
+      with:
+        name: android-aab
+        path: ./artifacts/android
+    
+    - name: Download iOS IPA
+      uses: actions/download-artifact@v4
+      with:
+        name: ios-ipa
+        path: ./artifacts/ios
+    
+    - name: Rename files
+      run: |
+        mv ./artifacts/android/app-release.apk ./artifacts/GymTracker-v${{ steps.version.outputs.version }}.apk
+        mv ./artifacts/android/app-release.aab ./artifacts/GymTracker-v${{ steps.version.outputs.version }}.aab
+        mv ./artifacts/ios/GymTracker.ipa ./artifacts/GymTracker-v${{ steps.version.outputs.version }}.ipa
+    
+    - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: v${{ github.run_number }}
-        name: Build ${{ github.run_number }}
-        files: build/app/outputs/bundle/release/*.aab
+        tag_name: v${{ steps.version.outputs.version }}-build.${{ github.run_number }}
+        name: Gym Tracker v${{ steps.version.outputs.version }} (Build ${{ github.run_number }})
+        body: |
+          ## 📥 Downloads
+          
+          | Platform | File |
+          |----------|------|
+          | Android APK | `GymTracker-v${{ steps.version.outputs.version }}.apk` |
+          | Android AAB | `GymTracker-v${{ steps.version.outputs.version }}.aab` |
+          | iOS IPA | `GymTracker-v${{ steps.version.outputs.version }}.ipa` |
+          
+          > ⚠️ **Not:** Bu build'ler imzasız (unsigned) olup sadece test/showcase amaçlıdır.
+        files: |
+          ./artifacts/GymTracker-v${{ steps.version.outputs.version }}.apk
+          ./artifacts/GymTracker-v${{ steps.version.outputs.version }}.aab
+          ./artifacts/GymTracker-v${{ steps.version.outputs.version }}.ipa
         draft: false
         prerelease: false
       env:
