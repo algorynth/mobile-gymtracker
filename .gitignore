@@ -51,7 +51,7 @@ windows/flutter/ephemeral/
 
 # Hive
 *.hive
-*.lock
+
 
 # Coverage
 coverage/
@@ -84,3 +84,8 @@ Thumbs.db
 .env.*
 secrets.dart
 android/key.properties
+
+# nix
+result/
+result-*
+.direnv/
