@@ -5,6 +5,8 @@ import '../providers/body_measurements_provider.dart';
 import '../providers/calorie_provider.dart';
 import '../providers/workout_provider.dart';
 import '../widgets/metric_card.dart';
+import '../widgets/hero_section.dart';
+import '../widgets/gradient_card.dart';
 import 'body_tracking_screen.dart';
 import 'calorie_screen.dart';
 import 'workout_screen.dart';
@@ -108,17 +110,22 @@ class DashboardScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Welcome Section
-            Text(
-              'Hoş Geldin! 💪',
-              style: Theme.of(context).textTheme.displaySmall,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'İşte bugünkü özetin',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+            // Hero Section
+            HeroSection(
+              title: 'Hoş Geldin! 💪',
+              subtitle: 'Bugün antrenman için harika bir gün!',
+              imagePath: 'assets/illustrations/workout_hero.png',
+              action: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text(
+                  'Hadi Başlayalım →',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+              ),
             ),
             const SizedBox(height: 24),
 
@@ -186,12 +193,8 @@ class DashboardScreen extends ConsumerWidget {
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: AppColors.cardGradient,
-                borderRadius: BorderRadius.circular(20),
-              ),
+            GradientCard(
+              isGlass: true,
               child: Column(
                 children: [
                   _buildStatRow(
@@ -199,6 +202,7 @@ class DashboardScreen extends ConsumerWidget {
                     'Tamamlanan Antrenman',
                     '${workoutStats['thisWeekWorkouts'] ?? 0}',
                     Icons.check_circle_outline,
+                    AppColors.accentGreen,
                   ),
                   const Divider(color: AppColors.darkBorder, height: 32),
                   _buildStatRow(
@@ -206,6 +210,7 @@ class DashboardScreen extends ConsumerWidget {
                     'Toplam Set',
                     '${workoutStats['totalSets'] ?? 0}',
                     Icons.fitness_center_rounded,
+                    AppColors.accentOrange,
                   ),
                   const Divider(color: AppColors.darkBorder, height: 32),
                   _buildStatRow(
@@ -213,6 +218,7 @@ class DashboardScreen extends ConsumerWidget {
                     'Ortalama Süre',
                     '${(workoutStats['averageDuration'] ?? 0).toStringAsFixed(0)} dk',
                     Icons.timer_outlined,
+                    AppColors.accentPurple,
                   ),
                 ],
               ),
@@ -308,16 +314,16 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatRow(BuildContext context, String label, String value, IconData icon) {
+  Widget _buildStatRow(BuildContext context, String label, String value, IconData icon, Color color) {
     return Row(
       children: [
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppColors.primaryColor.withOpacity(0.15),
+            color: color.withOpacity(0.15),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: AppColors.primaryColor, size: 24),
+          child: Icon(icon, color: color, size: 24),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -330,6 +336,7 @@ class DashboardScreen extends ConsumerWidget {
           value,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: color,
               ),
         ),
       ],
