@@ -4,82 +4,222 @@ import '../theme/app_colors.dart';
 import '../data/workout_template_library.dart';
 import '../models/workout_template.dart';
 import '../providers/workout_provider.dart';
+import '../providers/custom_templates_provider.dart';
 import 'workout_screen.dart';
+import 'create_template_screen.dart';
 
 class WorkoutTemplatesScreen extends ConsumerWidget {
   const WorkoutTemplatesScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final templates = WorkoutTemplateLibrary.predefinedTemplates;
+    final predefinedTemplates = WorkoutTemplateLibrary.predefinedTemplates;
+    final customTemplates = ref.watch(customTemplatesProvider);
 
-    return Scaffold(
-      backgroundColor: AppColors.darkBackground,
-      appBar: AppBar(
-        title: const Text('Antrenman Şablonları'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: AppColors.darkBackground,
+        appBar: AppBar(
+          title: const Text('Antrenman Şablonları'),
+          bottom: const TabBar(
+            indicatorColor: AppColors.primary,
+            labelColor: AppColors.primary,
+            unselectedLabelColor: AppColors.textSecondary,
+            tabs: [
+              Tab(text: 'Hazır Programlar'),
+              Tab(text: 'Şablonlarım'),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CreateTemplateScreen()),
+            );
+          },
+          backgroundColor: AppColors.primary,
+          icon: const Icon(Icons.add),
+          label: const Text('Yeni Şablon'),
+        ),
+        body: TabBarView(
           children: [
-            // Açıklama
-            Container(
+            // Tab 1: Hazır Programlar
+            SingleChildScrollView(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
-                    Icons.fitness_center_rounded,
-                    color: AppColors.textPrimary,
-                    size: 40,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  // Açıklama
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryGradient,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
                       children: [
-                        Text(
-                          'Hazır Programlar',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: AppColors.textPrimary,
-                                fontWeight: FontWeight.bold,
-                              ),
+                        const Icon(
+                          Icons.fitness_center_rounded,
+                          color: AppColors.textPrimary,
+                          size: 40,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Profesyonel antrenman şablonlarını kullanarak hemen başla!',
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.textPrimary.withOpacity( 0.8),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Hazır Programlar',
+                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                      color: AppColors.textPrimary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                               ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Profesyonel antrenman şablonlarını kullanarak hemen başla!',
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                      color: AppColors.textPrimary.withOpacity(0.8),
+                                    ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
+
+                  const SizedBox(height: 24),
+
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: predefinedTemplates.length,
+                    itemBuilder: (context, index) {
+                      final template = predefinedTemplates[index];
+                      return _buildTemplateCard(context, ref, template, isCustom: false);
+                    },
+                  ),
+                  const SizedBox(height: 80), // FAB için boşluk
                 ],
               ),
             ),
 
-            const SizedBox(height: 24),
+            // Tab 2: Şablonlarım
+            customTemplates.isEmpty
+                ? _buildEmptyCustomTemplates(context)
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Açıklama
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            gradient: AppColors.successGradient,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.star_rounded,
+                                color: AppColors.textPrimary,
+                                size: 40,
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Kendi Şablonlarınız',
+                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                            color: AppColors.textPrimary,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${customTemplates.length} adet özel şablonunuz var',
+                                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                            color: AppColors.textPrimary.withOpacity(0.8),
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
 
-            // Şablonlar Listesi
-            Text(
-              'Tüm Şablonlar',
-              style: Theme.of(context).textTheme.headlineMedium,
+                        const SizedBox(height: 24),
+
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: customTemplates.length,
+                          itemBuilder: (context, index) {
+                            final template = customTemplates[index];
+                            return _buildTemplateCard(context, ref, template, isCustom: true);
+                          },
+                        ),
+                        const SizedBox(height: 80), // FAB için boşluk
+                      ],
+                    ),
+                  ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyCustomTemplates(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.add_circle_outline,
+                size: 48,
+                color: Colors.white,
+              ),
             ),
-            const SizedBox(height: 16),
-
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: templates.length,
-              itemBuilder: (context, index) {
-                final template = templates[index];
-                return _buildTemplateCard(context, ref, template);
+            const SizedBox(height: 24),
+            Text(
+              'Henüz şablon oluşturmadınız',
+              style: Theme.of(context).textTheme.headlineMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Kendi antrenman şablonlarınızı oluşturarak daha hızlı başlayabilirsiniz.',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CreateTemplateScreen()),
+                );
               },
+              icon: const Icon(Icons.add),
+              label: const Text('İlk Şablonumu Oluştur'),
             ),
           ],
         ),
@@ -90,8 +230,9 @@ class WorkoutTemplatesScreen extends ConsumerWidget {
   Widget _buildTemplateCard(
     BuildContext context,
     WidgetRef ref,
-    WorkoutTemplate template,
-  ) {
+    WorkoutTemplate template, {
+    bool isCustom = false,
+  }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -129,7 +270,7 @@ class WorkoutTemplatesScreen extends ConsumerWidget {
                       Text(
                         WorkoutTemplateLibrary.getCategoryName(template.category),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textPrimary.withOpacity( 0.8),
+                              color: AppColors.textPrimary.withOpacity(0.8),
                             ),
                       ),
                     ],
@@ -138,7 +279,7 @@ class WorkoutTemplatesScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.textPrimary.withOpacity( 0.2),
+                    color: AppColors.textPrimary.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -189,7 +330,7 @@ class WorkoutTemplatesScreen extends ConsumerWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '${exercise.exerciseName}',
+                            exercise.exerciseName,
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           const Spacer(),
@@ -224,9 +365,11 @@ class WorkoutTemplatesScreen extends ConsumerWidget {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: () => _showTemplateDetails(context, template),
-                    icon: const Icon(Icons.visibility_rounded),
-                    label: const Text('Detaylar'),
+                    onPressed: () => isCustom
+                        ? _editTemplate(context, template)
+                        : _showTemplateDetails(context, template),
+                    icon: Icon(isCustom ? Icons.edit_rounded : Icons.visibility_rounded),
+                    label: Text(isCustom ? 'Düzenle' : 'Detaylar'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.textPrimary,
                       side: const BorderSide(color: AppColors.darkBorder),
@@ -265,9 +408,20 @@ class WorkoutTemplatesScreen extends ConsumerWidget {
         return const LinearGradient(
           colors: [Color(0xFF8B5CF6), Color(0xFF6D28D9)],
         );
+      case 'custom':
+        return AppColors.orangeGradient;
       default:
         return AppColors.cardGradient;
     }
+  }
+
+  void _editTemplate(BuildContext context, WorkoutTemplate template) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CreateTemplateScreen(existingTemplate: template),
+      ),
+    );
   }
 
   void _showTemplateDetails(BuildContext context, WorkoutTemplate template) {
@@ -334,7 +488,7 @@ class WorkoutTemplatesScreen extends ConsumerWidget {
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
-                              color: AppColors.primaryColor.withOpacity( 0.2),
+                              color: AppColors.primaryColor.withOpacity(0.2),
                               shape: BoxShape.circle,
                             ),
                             child: Center(
