@@ -4,8 +4,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
   // TODO: Production'da gerçek URL kullan
-  static const String baseUrl = 'http://10.0.2.2:8080/api'; // Android emulator
-  // static const String baseUrl = 'http://localhost:8080/api'; // iOS/Web
+  // Platform detection for correct URL
+  static const String baseUrl = 'http://localhost:8080/api'; // Web/Desktop
+  // static const String baseUrl = 'http://10.0.2.2:8080/api'; // Android emulator
   
   static const _storage = FlutterSecureStorage();
   static const _tokenKey = 'auth_token';

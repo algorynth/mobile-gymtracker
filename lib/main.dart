@@ -44,18 +44,25 @@ class GymTrackerApp extends ConsumerStatefulWidget {
 
 class _GymTrackerAppState extends ConsumerState<GymTrackerApp> {
   bool _isCheckingAuth = true;
+  bool _hasCheckedAuth = false;
 
   @override
   void initState() {
     super.initState();
-    _checkAuth();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAuth();
+    });
   }
 
   Future<void> _checkAuth() async {
+    if (_hasCheckedAuth) return;
+    _hasCheckedAuth = true;
     await ref.read(authProvider.notifier).checkAuth();
-    setState(() {
-      _isCheckingAuth = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isCheckingAuth = false;
+      });
+    }
   }
 
   @override
