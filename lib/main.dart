@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'theme/app_theme.dart';
 import 'services/database_service.dart';
+import 'services/auth_service.dart';
+import 'providers/auth_provider.dart';
 import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
 import 'data/exercise_library.dart';
-import 'services/database_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,16 +35,55 @@ Future<void> _initializeExercises() async {
   }
 }
 
-class GymTrackerApp extends StatelessWidget {
+class GymTrackerApp extends ConsumerStatefulWidget {
   const GymTrackerApp({Key? key}) : super(key: key);
 
   @override
+  ConsumerState<GymTrackerApp> createState() => _GymTrackerAppState();
+}
+
+class _GymTrackerAppState extends ConsumerState<GymTrackerApp> {
+  bool _isCheckingAuth = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuth();
+  }
+
+  Future<void> _checkAuth() async {
+    await ref.read(authProvider.notifier).checkAuth();
+    setState(() {
+      _isCheckingAuth = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+
     return MaterialApp(
       title: 'Gym Tracker',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const HomeScreen(),
+      home: _isCheckingAuth
+          ? const _SplashScreen()
+          : authState.isAuthenticated
+              ? const HomeScreen()
+              : const LoginScreen(),
+    );
+  }
+}
+
+class _SplashScreen extends StatelessWidget {
+  const _SplashScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 }

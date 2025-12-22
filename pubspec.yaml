@@ -25,6 +25,8 @@ dependencies:
   intl: ^0.18.1
   uuid: ^4.2.1
   shared_preferences: ^2.2.2
+  http: ^1.1.0
+  flutter_secure_storage: ^9.0.0
   
   # Image Picker
   image_picker: ^1.0.4

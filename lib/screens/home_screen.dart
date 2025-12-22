@@ -4,6 +4,7 @@ import '../theme/app_colors.dart';
 import '../providers/body_measurements_provider.dart';
 import '../providers/calorie_provider.dart';
 import '../providers/workout_provider.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/metric_card.dart';
 import '../widgets/hero_section.dart';
 import '../widgets/gradient_card.dart';
@@ -13,6 +14,7 @@ import 'workout_screen.dart';
 import 'profile_screen.dart';
 import 'progress_charts_screen.dart';
 import 'progress_photos_screen.dart';
+import 'login_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -102,6 +104,32 @@ class DashboardScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {},
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) async {
+              if (value == 'logout') {
+                await ref.read(authProvider.notifier).logout();
+                if (context.mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (route) => false,
+                  );
+                }
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    Icon(Icons.logout, color: AppColors.error),
+                    SizedBox(width: 8),
+                    Text('Çıkış Yap'),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
