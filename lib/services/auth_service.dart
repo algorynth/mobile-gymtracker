@@ -3,9 +3,9 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthService {
-  // TODO: Production'da gerçek URL kullan
-  // Platform detection for correct URL
-  static const String baseUrl = 'http://localhost:8080/api'; // Web/Desktop
+  // Production API URL
+  static const String baseUrl = 'https://gym-api.algorynth.net/api';
+  // static const String baseUrl = 'http://localhost:8080/api'; // Local development
   // static const String baseUrl = 'http://10.0.2.2:8080/api'; // Android emulator
   
   static const _storage = FlutterSecureStorage();
