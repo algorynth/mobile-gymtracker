@@ -15,6 +15,7 @@ import 'profile_screen.dart';
 import 'progress_charts_screen.dart';
 import 'progress_photos_screen.dart';
 import 'login_screen.dart';
+import 'account_settings_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -108,7 +109,12 @@ class DashboardScreen extends ConsumerWidget {
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             onSelected: (value) async {
-              if (value == 'logout') {
+              if (value == 'settings') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AccountSettingsScreen()),
+                );
+              } else if (value == 'logout') {
                 await ref.read(authProvider.notifier).logout();
                 if (context.mounted) {
                   Navigator.of(context).pushAndRemoveUntil(
@@ -119,6 +125,16 @@ class DashboardScreen extends ConsumerWidget {
               }
             },
             itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    Icon(Icons.settings, color: AppColors.primaryColor),
+                    SizedBox(width: 8),
+                    Text('Hesap Ayarları'),
+                  ],
+                ),
+              ),
               const PopupMenuItem(
                 value: 'logout',
                 child: Row(

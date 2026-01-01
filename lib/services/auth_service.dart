@@ -107,6 +107,168 @@ class AuthService {
     await _storage.write(key: _tokenKey, value: token);
     await _storage.write(key: _userKey, value: jsonEncode(user));
   }
+
+  // Update email
+  static Future<AuthResult> updateEmail({
+    required String newEmail,
+    required String password,
+  }) async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return AuthResult.failure('Not authenticated');
+      }
+
+      final response = await http.put(
+        Uri.parse('$baseUrl/user/email'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'new_email': newEmail,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        await _saveAuthData(data['token'], data['user']);
+        return AuthResult.success(
+          token: data['token'],
+          user: User.fromJson(data['user']),
+        );
+      } else {
+        final error = jsonDecode(response.body);
+        return AuthResult.failure(error['error'] ?? 'E-posta güncellenemedi');
+      }
+    } catch (e) {
+      return AuthResult.failure('Bağlantı hatası: $e');
+    }
+  }
+
+  // Update password
+  static Future<String?> updatePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return 'Oturum açılmamış';
+      }
+
+      final response = await http.put(
+        Uri.parse('$baseUrl/user/password'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'old_password': oldPassword,
+          'new_password': newPassword,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return null; // Success
+      } else {
+        final error = jsonDecode(response.body);
+        return error['error'] ?? 'Şifre güncellenemedi';
+      }
+    } catch (e) {
+      return 'Bağlantı hatası: $e';
+    }
+  }
+
+  // Update name
+  static Future<String?> updateName({required String name}) async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return 'Oturum açılmamış';
+      }
+
+      final response = await http.put(
+        Uri.parse('$baseUrl/user/name'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'name': name}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        await _saveAuthData(await getToken() ?? '', data['user']);
+        return null; // Success
+      } else {
+        final error = jsonDecode(response.body);
+        return error['error'] ?? 'İsim güncellenemedi';
+      }
+    } catch (e) {
+      return 'Bağlantı hatası: $e';
+    }
+  }
+
+  // Update profile picture
+  static Future<String?> updateProfilePicture({required String imageUrl}) async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return 'Oturum açılmamış';
+      }
+
+      final response = await http.put(
+        Uri.parse('$baseUrl/user/profile-picture'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'profile_picture_url': imageUrl}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        await _saveAuthData(await getToken() ?? '', data['user']);
+        return null; // Success
+      } else {
+        final error = jsonDecode(response.body);
+        return error['error'] ?? 'Profil resmi güncellenemedi';
+      }
+    } catch (e) {
+      return 'Bağlantı hatası: $e';
+    }
+  }
+
+  // Delete account
+  static Future<String?> deleteAccount({required String password}) async {
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return 'Oturum açılmamış';
+      }
+
+      final response = await http.delete(
+        Uri.parse('$baseUrl/user/account'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'password': password}),
+      );
+
+      if (response.statusCode == 200) {
+        await logout();
+        return null; // Success
+      } else {
+        final error = jsonDecode(response.body);
+        return error['error'] ?? 'Hesap silinemedi';
+      }
+    } catch (e) {
+      return 'Bağlantı hatası: $e';
+    }
+  }
 }
 
 // Auth Result
@@ -137,12 +299,14 @@ class User {
   final int id;
   final String email;
   final String name;
+  final String? profilePictureUrl;
   final DateTime createdAt;
 
   User({
     required this.id,
     required this.email,
     required this.name,
+    this.profilePictureUrl,
     required this.createdAt,
   });
 
@@ -151,6 +315,7 @@ class User {
       id: json['id'],
       email: json['email'],
       name: json['name'] ?? '',
+      profilePictureUrl: json['profile_picture_url'],
       createdAt: DateTime.parse(json['created_at']),
     );
   }
@@ -160,6 +325,7 @@ class User {
       'id': id,
       'email': email,
       'name': name,
+      'profile_picture_url': profilePictureUrl,
       'created_at': createdAt.toIso8601String(),
     };
   }
