@@ -311,29 +311,78 @@ class _WorkoutScreenState extends ConsumerState<WorkoutScreen> {
                   itemCount: ExerciseLibrary.predefinedExercises.length,
                   itemBuilder: (context, index) {
                     final exercise = ExerciseLibrary.predefinedExercises[index];
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      shape: RoundedRectangleBorder(
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.darkCard,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      tileColor: AppColors.darkCard,
-                      title: Text(exercise.name),
-                      subtitle: Text(
-                        _getMuscleGroupName(exercise.muscleGroup),
-                        style: TextStyle(color: AppColors.textSecondary),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(12),
+                        // GIF preview
+                        leading: exercise.imageUrl != null
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  width: 60,
+                                  height: 60,
+                                  color: AppColors.darkSurface,
+                                  child: Image.network(
+                                    exercise.imageUrl!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Icon(
+                                        Icons.fitness_center,
+                                        color: AppColors.primaryColor,
+                                      );
+                                    },
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress.expectedTotalBytes != null
+                                              ? loadingProgress.cumulativeBytesLoaded /
+                                                  loadingProgress.expectedTotalBytes!
+                                              : null,
+                                          strokeWidth: 2,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryColor.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.fitness_center,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                        title: Text(
+                          exercise.name,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                        subtitle: Text(
+                          _getMuscleGroupName(exercise.muscleGroup),
+                          style: TextStyle(color: AppColors.textSecondary),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                          color: AppColors.textSecondary,
+                        ),
+                        onTap: () {
+                          Navigator.pop(context);
+                          _startWorkout(exercise.id, exercise.name);
+                        },
                       ),
-                      trailing: const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 16,
-                        color: AppColors.textSecondary,
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        _startWorkout(exercise.id, exercise.name);
-                      },
                     );
                   },
                 ),

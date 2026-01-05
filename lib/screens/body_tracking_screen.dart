@@ -18,6 +18,10 @@ class _BodyTrackingScreenState extends ConsumerState<BodyTrackingScreen> {
   final _bodyFatController = TextEditingController();
   final _muscleMassController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
+  
+  // Toggle states: true = kg, false = %
+  bool _bodyFatIsKg = false;
+  bool _muscleMassIsKg = false;
 
   @override
   void dispose() {
@@ -45,10 +49,18 @@ class _BodyTrackingScreenState extends ConsumerState<BodyTrackingScreen> {
     if (_formKey.currentState!.validate()) {
       await ref.read(bodyMeasurementsProvider.notifier).addMeasurement(
             weightKg: double.parse(_weightController.text),
-            bodyFatPercentage: _bodyFatController.text.isNotEmpty
+            // Body fat - based on toggle
+            bodyFatPercentage: !_bodyFatIsKg && _bodyFatController.text.isNotEmpty
                 ? double.parse(_bodyFatController.text)
                 : null,
-            muscleMassPercentage: _muscleMassController.text.isNotEmpty
+            bodyFatKg: _bodyFatIsKg && _bodyFatController.text.isNotEmpty
+                ? double.parse(_bodyFatController.text)
+                : null,
+            // Muscle mass - based on toggle
+            muscleMassPercentage: !_muscleMassIsKg && _muscleMassController.text.isNotEmpty
+                ? double.parse(_muscleMassController.text)
+                : null,
+            muscleMassKg: _muscleMassIsKg && _muscleMassController.text.isNotEmpty
                 ? double.parse(_muscleMassController.text)
                 : null,
             measurementDate: _selectedDate,
@@ -186,41 +198,163 @@ class _BodyTrackingScreenState extends ConsumerState<BodyTrackingScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Body Fat Input
-                    TextFormField(
-                      controller: _bodyFatController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value != null && value.isNotEmpty) {
-                          return Validators.isValidPercentage(value,
-                              fieldName: 'Yağ oranı');
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Yağ Oranı (%) - Opsiyonel',
-                        hintText: 'Örn: 18',
-                        prefixIcon: Icon(Icons.pie_chart_rounded),
-                      ),
+                    // Body Fat Input with Toggle
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Vücut Yağı - Opsiyonel',
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  '%',
+                                  style: TextStyle(
+                                    color: !_bodyFatIsKg
+                                        ? AppColors.primaryColor
+                                        : AppColors.textSecondary,
+                                    fontWeight: !_bodyFatIsKg
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                                Switch(
+                                  value: _bodyFatIsKg,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _bodyFatIsKg = value;
+                                      _bodyFatController.clear();
+                                    });
+                                  },
+                                  activeColor: AppColors.primaryColor,
+                                ),
+                                Text(
+                                  'kg',
+                                  style: TextStyle(
+                                    color: _bodyFatIsKg
+                                        ? AppColors.primaryColor
+                                        : AppColors.textSecondary,
+                                    fontWeight: _bodyFatIsKg
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _bodyFatController,
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value != null && value.isNotEmpty) {
+                              if (_bodyFatIsKg) {
+                                return Validators.isValidWeight(value);
+                              } else {
+                                return Validators.isValidPercentage(value,
+                                    fieldName: 'Yağ oranı');
+                              }
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            labelText: _bodyFatIsKg ? 'Yağ Kütlesi (kg)' : 'Yağ Oranı (%)',
+                            hintText: _bodyFatIsKg ? 'Örn: 13.5' : 'Örn: 18',
+                            prefixIcon: Icon(
+                              _bodyFatIsKg
+                                  ? Icons.scale_rounded
+                                  : Icons.pie_chart_rounded,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
 
-                    // Muscle Mass Input
-                    TextFormField(
-                      controller: _muscleMassController,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value != null && value.isNotEmpty) {
-                          return Validators.isValidPercentage(value,
-                              fieldName: 'Kas oranı');
-                        }
-                        return null;
-                      },
-                      decoration: const InputDecoration(
-                        labelText: 'Kas Oranı (%) - Opsiyonel',
-                        hintText: 'Örn: 42',
-                        prefixIcon: Icon(Icons.fitness_center_rounded),
-                      ),
+                    // Muscle Mass Input with Toggle
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Kas - Opsiyonel',
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
+                            ),
+                            Row(
+                              children: [
+                                Text(
+                                  '%',
+                                  style: TextStyle(
+                                    color: !_muscleMassIsKg
+                                        ? AppColors.primaryColor
+                                        : AppColors.textSecondary,
+                                    fontWeight: !_muscleMassIsKg
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                                Switch(
+                                  value: _muscleMassIsKg,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _muscleMassIsKg = value;
+                                      _muscleMassController.clear();
+                                    });
+                                  },
+                                  activeColor: AppColors.primaryColor,
+                                ),
+                                Text(
+                                  'kg',
+                                  style: TextStyle(
+                                    color: _muscleMassIsKg
+                                        ? AppColors.primaryColor
+                                        : AppColors.textSecondary,
+                                    fontWeight: _muscleMassIsKg
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _muscleMassController,
+                          keyboardType: TextInputType.number,
+                          validator: (value) {
+                            if (value != null && value.isNotEmpty) {
+                              if (_muscleMassIsKg) {
+                                return Validators.isValidWeight(value);
+                              } else {
+                                return Validators.isValidPercentage(value,
+                                    fieldName: 'Kas oranı');
+                              }
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                            labelText: _muscleMassIsKg ? 'Kas Kütlesi (kg)' : 'Kas Oranı (%)',
+                            hintText: _muscleMassIsKg ? 'Örn: 31.5' : 'Örn: 42',
+                            prefixIcon: Icon(
+                              _muscleMassIsKg
+                                  ? Icons.line_weight_rounded
+                                  : Icons.fitness_center_rounded,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 24),
 

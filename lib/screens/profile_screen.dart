@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../theme/app_colors.dart';
 import '../providers/user_profile_provider.dart';
+import '../providers/body_measurements_provider.dart';
 import '../utils/validators.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -312,6 +313,189 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ],
                 ),
               ),
+              
+              const SizedBox(height: 24),
+              
+              // Body Measurements Section
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.darkCard,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.monitor_weight_rounded, color: AppColors.accentGreen),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Vücut Ölçümleri',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final latestMeasurement = ref.watch(latestMeasurementProvider);
+                        
+                        if (latestMeasurement == null) {
+                          return Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: AppColors.darkSurface,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.info_outline,
+                                    size: 48,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    'Henüz ölçüm eklenmemiş',
+                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                          color: AppColors.textSecondary,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                        
+                        // Calculate BMI
+                        final bmi = latestMeasurement.weightKg / 
+                            ((profile.heightCm / 100) * (profile.heightCm / 100));
+                        final bmiCategory = _getBMICategory(bmi);
+                        final bmiColor = _getBMIColor(bmi);
+                        
+                        return Column(
+                          children: [
+                            // BMI Card
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    bmiColor.withOpacity(0.2),
+                                    bmiColor.withOpacity(0.05),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: bmiColor.withOpacity(0.3)),
+                              ),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'BMI (Vücut Kitle İndeksi)',
+                                        style: Theme.of(context).textTheme.titleMedium,
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: bmiColor.withOpacity(0.2),
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        child: Text(
+                                          bmiCategory,
+                                          style: TextStyle(
+                                            color: bmiColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        bmi.toStringAsFixed(1),
+                                        style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                                              color: bmiColor,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'kg/m²',
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                              color: AppColors.textSecondary,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            
+                            const SizedBox(height: 16),
+                            
+                            // Current Stats Grid
+                            GridView.count(
+                              crossAxisCount: 2,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 12,
+                              childAspectRatio: 1.3,
+                              children: [
+                                _buildMeasurementCard(
+                                  context,
+                                  'Kilo',
+                                  '${latestMeasurement.weightKg.toStringAsFixed(1)} kg',
+                                  Icons.monitor_weight_rounded,
+                                  AppColors.accentGreen,
+                                ),
+                                _buildMeasurementCard(
+                                  context,
+                                  'Yağ Oranı',
+                                  latestMeasurement.bodyFatPercentage != null
+                                      ? '${latestMeasurement.bodyFatPercentage!.toStringAsFixed(1)}%'
+                                      : '--',
+                                  Icons.pie_chart_rounded,
+                                  AppColors.accentOrange,
+                                ),
+                                _buildMeasurementCard(
+                                  context,
+                                  'Kas Oranı',
+                                  latestMeasurement.muscleMassPercentage != null
+                                      ? '${latestMeasurement.muscleMassPercentage!.toStringAsFixed(1)}%'
+                                      : '--',
+                                  Icons.fitness_center_rounded,
+                                  AppColors.accentPurple,
+                                ),
+                                _buildMeasurementCard(
+                                  context,
+                                  'Son Ölçüm',
+                                  _formatDate(latestMeasurement.measurementDate),
+                                  Icons.calendar_today_rounded,
+                                  AppColors.primaryColor,
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
             ],
 
             const SizedBox(height: 32),
@@ -504,5 +688,76 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       'gain_muscle': 'Kas Kazan',
     };
     return map[goal] ?? goal;
+  }
+  
+  Widget _buildMeasurementCard(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.darkSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: color, size: 20),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  String _getBMICategory(double bmi) {
+    if (bmi < 18.5) return 'Zayıf';
+    if (bmi < 25) return 'Normal';
+    if (bmi < 30) return 'Fazla Kilolu';
+    return 'Obez';
+  }
+  
+  Color _getBMIColor(double bmi) {
+    if (bmi < 18.5) return AppColors.accentYellow;
+    if (bmi < 25) return AppColors.accentGreen;
+    if (bmi < 30) return AppColors.accentOrange;
+    return AppColors.error;
+  }
+  
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date).inDays;
+    
+    if (difference == 0) return 'Bugün';
+    if (difference == 1) return 'Dün';
+    if (difference < 7) return '$difference gün önce';
+    if (difference < 30) return '${(difference / 7).floor()} hafta önce';
+    return '${date.day}/${date.month}/${date.year}';
   }
 }

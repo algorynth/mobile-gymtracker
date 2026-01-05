@@ -9,7 +9,9 @@ class BodyMeasurementService {
   static Future<void> addMeasurement({
     required double weightKg,
     double? bodyFatPercentage,
+    double? bodyFatKg,
     double? muscleMassPercentage,
+    double? muscleMassKg,
     DateTime? measurementDate,
     String? notes,
   }) async {
@@ -17,7 +19,9 @@ class BodyMeasurementService {
       id: _uuid.v4(),
       weightKg: weightKg,
       bodyFatPercentage: bodyFatPercentage,
+      bodyFatKg: bodyFatKg,
       muscleMassPercentage: muscleMassPercentage,
+      muscleMassKg: muscleMassKg,
       measurementDate: measurementDate ?? DateTime.now(),
       notes: notes,
     );

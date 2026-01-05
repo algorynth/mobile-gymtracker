@@ -19,14 +19,18 @@ class BodyMeasurementsNotifier extends StateNotifier<List<BodyMeasurement>> {
   Future<void> addMeasurement({
     required double weightKg,
     double? bodyFatPercentage,
+    double? bodyFatKg,
     double? muscleMassPercentage,
+    double? muscleMassKg,
     DateTime? measurementDate,
     String? notes,
   }) async {
     await BodyMeasurementService.addMeasurement(
       weightKg: weightKg,
       bodyFatPercentage: bodyFatPercentage,
+      bodyFatKg: bodyFatKg,
       muscleMassPercentage: muscleMassPercentage,
+      muscleMassKg: muscleMassKg,
       measurementDate: measurementDate,
       notes: notes,
     );

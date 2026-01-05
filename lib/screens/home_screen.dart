@@ -11,6 +11,7 @@ import '../widgets/gradient_card.dart';
 import 'body_tracking_screen.dart';
 import 'calorie_screen.dart';
 import 'workout_screen.dart';
+import 'social/social_feed_screen.dart';
 import 'profile_screen.dart';
 import 'progress_charts_screen.dart';
 import 'progress_photos_screen.dart';
@@ -31,7 +32,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     const DashboardScreen(),
     const BodyTrackingScreen(),
     const WorkoutScreen(),
-    const ProfileScreen(),
+    const SocialFeedScreen(),
   ];
 
   @override
@@ -78,8 +79,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               label: 'Antrenman',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.person_rounded),
-              label: 'Profil',
+              icon: Icon(Icons.people_alt_rounded),
+              label: 'Sosyal',
             ),
           ],
         ),
@@ -109,7 +110,12 @@ class DashboardScreen extends ConsumerWidget {
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             onSelected: (value) async {
-              if (value == 'settings') {
+              if (value == 'profile') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                );
+              } else if (value == 'settings') {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const AccountSettingsScreen()),
@@ -125,6 +131,16 @@ class DashboardScreen extends ConsumerWidget {
               }
             },
             itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'profile',
+                child: Row(
+                  children: [
+                    Icon(Icons.person_rounded, color: AppColors.primaryColor),
+                    SizedBox(width: 8),
+                    Text('Profil'),
+                  ],
+                ),
+              ),
               const PopupMenuItem(
                 value: 'settings',
                 child: Row(

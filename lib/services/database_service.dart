@@ -5,6 +5,7 @@ import '../models/exercise.dart';
 import '../models/workout.dart';
 import '../models/workout_set.dart';
 import '../models/progress_photo.dart';
+import '../models/workout_template.dart';
 
 class DatabaseService {
   static const String userProfileBoxName = 'user_profile';
@@ -13,6 +14,7 @@ class DatabaseService {
   static const String workoutsBoxName = 'workouts';
   static const String workoutSetsBoxName = 'workout_sets';
   static const String progressPhotosBoxName = 'progress_photos';
+  static const String customTemplatesBoxName = 'custom_templates';
 
   // Hive'ı başlat
   static Future<void> initialize() async {
@@ -25,6 +27,8 @@ class DatabaseService {
     Hive.registerAdapter(WorkoutAdapter());
     Hive.registerAdapter(WorkoutSetAdapter());
     Hive.registerAdapter(ProgressPhotoAdapter());
+    Hive.registerAdapter(WorkoutTemplateAdapter());
+    Hive.registerAdapter(TemplateExerciseAdapter());
 
     // Box'ları aç
     await Hive.openBox<UserProfile>(userProfileBoxName);
@@ -33,6 +37,7 @@ class DatabaseService {
     await Hive.openBox<Workout>(workoutsBoxName);
     await Hive.openBox<WorkoutSet>(workoutSetsBoxName);
     await Hive.openBox<ProgressPhoto>(progressPhotosBoxName);
+    await Hive.openBox<WorkoutTemplate>(customTemplatesBoxName);
   }
 
   // Box'ları al

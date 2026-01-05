@@ -78,22 +78,37 @@ class AuthService {
 
   // Logout
   static Future<void> logout() async {
-    await _storage.delete(key: _tokenKey);
-    await _storage.delete(key: _userKey);
+    try {
+      await _storage.delete(key: _tokenKey);
+      await _storage.delete(key: _userKey);
+    } catch (e) {
+      // Secure storage not available on this platform
+      print('Warning: Could not delete secure storage: $e');
+    }
   }
 
   // Get current user
   static Future<User?> getCurrentUser() async {
-    final userData = await _storage.read(key: _userKey);
-    if (userData != null) {
-      return User.fromJson(jsonDecode(userData));
+    try {
+      final userData = await _storage.read(key: _userKey);
+      if (userData != null) {
+        return User.fromJson(jsonDecode(userData));
+      }
+    } catch (e) {
+      // Secure storage not available on this platform
+      print('Warning: Could not read user data: $e');
     }
     return null;
   }
 
   // Get token
   static Future<String?> getToken() async {
-    return await _storage.read(key: _tokenKey);
+    try {
+      return await _storage.read(key: _tokenKey);
+    } catch (e) {
+      // Secure storage not available on this platform (e.g., Linux)
+      return null;
+    }
   }
 
   // Check if authenticated
@@ -104,8 +119,14 @@ class AuthService {
 
   // Save auth data
   static Future<void> _saveAuthData(String token, Map<String, dynamic> user) async {
-    await _storage.write(key: _tokenKey, value: token);
-    await _storage.write(key: _userKey, value: jsonEncode(user));
+    try {
+      await _storage.write(key: _tokenKey, value: token);
+      await _storage.write(key: _userKey, value: jsonEncode(user));
+    } catch (e) {
+      // Secure storage not available on this platform (e.g., Linux)
+      // In production, you might want to use shared_preferences as fallback
+      print('Warning: Secure storage not available: $e');
+    }
   }
 
   // Update email

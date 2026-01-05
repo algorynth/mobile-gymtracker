@@ -34,6 +34,9 @@ dependencies:
   
   # UI Components
   cupertino_icons: ^1.0.2
+  share_plus: ^12.0.1
+  path_provider: ^2.1.5
+  screenshot: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -74,3 +77,10 @@ flutter_native_splash:
     color: "#0F172A"
     icon_background_color: "#0F172A"
     image: "assets/images/logo.png"
+
+# Dependency overrides to fix Linux build issues permanently
+dependency_overrides:
+  flutter_secure_storage_linux:
+    path: packages/flutter_secure_storage_linux_dummy
+
+
